@@ -10,8 +10,13 @@
             <a href="{{ route('promo') }}" class="hover:text-gray-200">Promo</a>
             <a href="{{ route('keranjang') }}" class="hover:text-gray-200">Keranjang</a>
             <a href="{{ route('checkout') }}" class="hover:text-gray-200">Checkout</a>
-            <a href="{{ route('login') }}" class="hover:text-gray-200">Login</a>
-            <a href="{{ route('register') }}" class="rounded-lg bg-white px-4 py-1 font-semibold text-forest hover:bg-sand">Register</a>
+
+            @auth
+                <a href="{{ route('dashboard') }}" class="rounded-lg bg-white px-4 py-1 font-semibold text-forest hover:bg-sand">Dashboard</a>
+            @else
+                <a href="{{ route('login') }}" class="hover:text-gray-200">Login</a>
+                <a href="{{ route('register') }}" class="rounded-lg bg-white px-4 py-1 font-semibold text-forest hover:bg-sand">Register</a>
+            @endauth
         </div>
     </div>
 
@@ -21,7 +26,12 @@
         <a href="{{ route('promo') }}">Promo</a>
         <a href="{{ route('keranjang') }}">Keranjang</a>
         <a href="{{ route('checkout') }}">Checkout</a>
-        <a href="{{ route('login') }}">Login</a>
-        <a href="{{ route('register') }}">Register</a>
+
+        @auth
+            <a href="{{ route('dashboard') }}">Dashboard</a>
+        @else
+            <a href="{{ route('login') }}">Login</a>
+            <a href="{{ route('register') }}">Register</a>
+        @endauth
     </div>
 </nav>

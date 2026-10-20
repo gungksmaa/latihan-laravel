@@ -27,10 +27,10 @@
             <h2 class="mb-3 text-xl font-semibold">Ringkasan</h2>
             @php $total = 0; @endphp
             @foreach ($item as $p)
-                @php $total += $p['price'] * 2; @endphp
+                @php $total += $p->harga_dewasa * 2; @endphp
                 <div class="flex justify-between border-b py-2 text-sm">
-                    <span>{{ $p['name'] }} × 2</span>
-                    <span>Rp {{ number_format($p['price'] * 2, 0, ',', '.') }}</span>
+                    <span>{{ $p->nama }} × 2</span>
+                    <span>Rp {{ number_format($p->harga_dewasa * 2, 0, ',', '.') }}</span>
                 </div>
             @endforeach
             <p class="mt-3 flex justify-between font-semibold text-forest">

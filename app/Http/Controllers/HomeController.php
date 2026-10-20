@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Data\DestinasiData;
+use App\Models\Destinasi;
+use App\Models\Kategori;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -10,7 +11,7 @@ class HomeController extends Controller
     // Landing page
     public function index()
     {
-        $unggulan = array_slice(DestinasiData::all(), 0, 4);
+        $unggulan = Destinasi::with('kategori')->where('status', 'Y')->take(4)->get();
 
         return view('frontpage.landingpage', [
             'title' => 'Beranda',
@@ -21,32 +22,40 @@ class HomeController extends Controller
     // Daftar destinasi + pencarian & filter kategori
     public function destinasi(Request $request)
     {
-        $q = strtolower(trim((string) $request->query('q', '')));
-        $kategori = (int) $request->query('kategori', 0);
+        $q = trim((string) $request->query('q', ''));
+        $kategoriDipilih = (int) $request->query('kategori', 0);
 
-        $daftar = array_values(array_filter(DestinasiData::all(), function ($d) use ($q, $kategori) {
-            $cocokKategori = $kategori === 0 || $d['category'] === $kategori;
-            $cocokKata = $q === '' || str_contains(strtolower($d['name'].' '.$d['location'].' '.$d['category_name']), $q);
-            return $cocokKategori && $cocokKata;
-        }));
+        $query = Destinasi::with('kategori')->where('status', 'Y');
+
+        if ($kategoriDipilih !== 0) {
+            $query->where('id_kategori', $kategoriDipilih);
+        }
+        if ($q !== '') {
+            $query->where(function ($w) use ($q) {
+                $w->where('nama', 'like', "%$q%")
+                  ->orWhere('lokasi', 'like', "%$q%")
+                  ->orWhereHas('kategori', function ($k) use ($q) {
+                      $k->where('nama_kategori', 'like', "%$q%");
+                  });
+            });
+        }
 
         return view('frontpage.destinasi', [
             'title' => 'Destinasi',
-            'daftar' => $daftar,
-            'kategori' => DestinasiData::kategori(),
-            'q' => $request->query('q', ''),
-            'kategoriDipilih' => $kategori,
+            'daftar' => $query->get(),
+            'kategori' => [0 => 'Semua Kategori'] + Kategori::pluck('nama_kategori', 'id_kategori')->toArray(),
+            'q' => $q,
+            'kategoriDipilih' => $kategoriDipilih,
         ]);
     }
 
     // Detail satu destinasi berdasarkan slug
     public function detail(string $slug)
     {
-        $destinasi = DestinasiData::find($slug);
-        abort_if($destinasi === null, 404);
+        $destinasi = Destinasi::with('kategori')->where('slug', $slug)->where('status', 'Y')->firstOrFail();
 
         return view('frontpage.detail', [
-            'title' => $destinasi['name'],
+            'title' => $destinasi->nama,
             'p' => $destinasi,
         ]);
     }
@@ -56,17 +65,17 @@ class HomeController extends Controller
         return view('frontpage.promo', ['title' => 'Promo']);
     }
 
-    // Keranjang & checkout masih statis (prototipe). Logika asli menyusul di modul berikutnya.
+    // Keranjang & checkout masih statis (prototipe)
     public function keranjang()
     {
-        $item = array_slice(DestinasiData::all(), 0, 2);
+        $item = Destinasi::where('status', 'Y')->take(2)->get();
 
         return view('frontpage.keranjang', ['title' => 'Keranjang', 'item' => $item]);
     }
 
     public function checkout()
     {
-        $item = array_slice(DestinasiData::all(), 0, 2);
+        $item = Destinasi::where('status', 'Y')->take(2)->get();
 
         return view('frontpage.checkout', ['title' => 'Checkout', 'item' => $item]);
     }

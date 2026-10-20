@@ -6,14 +6,14 @@
         @php $total = 0; @endphp
         <div class="space-y-4">
             @foreach ($item as $p)
-                @php $total += $p['price'] * 2; @endphp
+                @php $total += $p->harga_dewasa * 2; @endphp
                 <div class="flex flex-col gap-3 rounded-lg border bg-white p-4 shadow-sm md:flex-row md:items-center md:justify-between">
                     <div class="flex items-center gap-4">
-                        <img src="{{ asset('images/'.$p['img']) }}" alt="{{ $p['name'] }}" class="h-16 w-16 rounded-md bg-sage/20 object-cover">
+                        <img src="{{ asset($p->foto) }}" alt="{{ $p->nama }}" class="h-16 w-16 rounded-md bg-sage/20 object-cover">
                         <div>
-                            <h2 class="font-semibold">{{ $p['name'] }}</h2>
-                            <p class="text-gray-600">Rp {{ number_format($p['price'], 0, ',', '.') }} / tiket · Dewasa × 2</p>
-                            <p class="text-sm text-gray-500">Subtotal: Rp {{ number_format($p['price'] * 2, 0, ',', '.') }}</p>
+                            <h2 class="font-semibold">{{ $p->nama }}</h2>
+                            <p class="text-gray-600">Rp {{ number_format($p->harga_dewasa, 0, ',', '.') }} / tiket · Dewasa × 2</p>
+                            <p class="text-sm text-gray-500">Subtotal: Rp {{ number_format($p->harga_dewasa * 2, 0, ',', '.') }}</p>
                         </div>
                     </div>
                     <button type="button" class="rounded-lg bg-red-500 px-3 py-1 text-white hover:bg-red-600">Delete</button>
